@@ -6,9 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Instansi extends Model
 {
-          protected $primaryKey = 'instansi_id';
+    protected $primaryKey = 'instansi_id';
+
     public $incrementing = true;
+
     protected $keyType = 'int';
-        protected $fillable = ['nama_instansi', 'deskripsi'];
+    
+    protected $fillable = ['nama_instansi', 'deskripsi'];
+    
+    public function counter()
+    {
+        return $this->belongsTo(Counter::class);
+    }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
 
 }

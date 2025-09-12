@@ -16,6 +16,10 @@ class InstansiResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Instansi';
+
+    protected static ?string $Label = 'Instansi';
+
     public static function form(Form $form): Form
     {
         return $form

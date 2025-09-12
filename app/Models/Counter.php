@@ -27,12 +27,18 @@ class Counter extends Model
     public function instansi()
     {
         return $this->belongsTo(Instansi::class, 'instansi_id');
+        return $this->hasMany(Instansi::class);
     }
 
     // Relasi ke tabel Service
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class);
     }
 
     // Relasi ke tabel Queue

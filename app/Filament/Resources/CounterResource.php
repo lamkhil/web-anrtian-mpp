@@ -23,7 +23,7 @@ class CounterResource extends Resource
 {
     protected static ?string $model = Counter::class;
 
-    protected static ?string $navigationLabel = 'Menejemen Loket';
+    protected static ?string $navigationLabel = 'Manajemen Loket';
 
     protected static ?string $Label = 'Loket';
     
