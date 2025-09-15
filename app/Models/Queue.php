@@ -34,7 +34,8 @@ class Queue extends Model
 
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(\App\Models\Service::class, 'service_id', 'id');
     }
+
 
 }

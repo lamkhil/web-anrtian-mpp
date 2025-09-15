@@ -2,14 +2,12 @@
 
 namespace App\Exports;
 
-use App\Models\Service;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class RekapLayananExport implements FromCollection, WithHeadings
+class RekapLayananExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
     protected $from;
     protected $to;
@@ -22,20 +20,25 @@ class RekapLayananExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return Service::query()
-            ->withCount(['queues as total' => function ($q) {
-                $q->whereBetween('created_at', [
-                    now()->parse($this->from)->startOfDay(),
-                    now()->parse($this->to)->endOfDay(),
-                ]);
-            }])
-            ->get(['name']); // hanya ambil kolom name
+        $from = now()->parse($this->from)->startOfDay();
+        $to   = now()->parse($this->to)->endOfDay();
+
+        return DB::table('instansis as i')
+            ->select('i.nama_instansi as Jenis_Instansi', DB::raw('COUNT(q.id) as Jumlah_Pemohon'))
+            ->leftJoin('services as s', 's.instansi_id', '=', 'i.instansi_id')
+            ->leftJoin('queues as q', function ($join) use ($from, $to) {
+                $join->on('q.service_id', '=', 's.id')
+                     ->whereBetween('q.created_at', [$from, $to]);
+            })
+            ->groupBy('i.instansi_id', 'i.nama_instansi')
+            ->orderBy('i.nama_instansi')
+            ->get();
     }
 
     public function headings(): array
     {
         return [
-            'Layanan',
+            'Jenis Instansi',
             'Jumlah Pemohon',
         ];
     }

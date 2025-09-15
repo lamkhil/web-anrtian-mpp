@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Instansi extends Model
 {
+    protected $table = 'instansis';
+
     protected $primaryKey = 'instansi_id';
 
     public $incrementing = true;
@@ -21,7 +23,6 @@ class Instansi extends Model
 
     public function services()
     {
-        return $this->hasMany(Service::class);
+        return $this->hasMany(\App\Models\Service::class, 'instansi_id', 'instansi_id');
     }
-
 }

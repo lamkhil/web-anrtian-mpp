@@ -9,6 +9,7 @@ use Filament\Actions\Action;
 use App\Models\Service;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\RekapLayananExport;
+use Illuminate\Support\Facades\DB;
 
 class MonitoringDashboard extends Page implements Forms\Contracts\HasForms
 {
@@ -93,24 +94,43 @@ class MonitoringDashboard extends Page implements Forms\Contracts\HasForms
     }
     public function getMonitoringRealTime()
     {
-    return [
-        'menunggu' => \App\Models\Queue::where('status', 'menunggu')->get(),
-        'dipanggil' => \App\Models\Queue::where('status', 'dipanggil')->get(),
-        'selesai' => \App\Models\Queue::where('status', 'selesai')->get(),
-    ];
+        return Service::withCount([
+            // jumlah antrian menunggu per layanan
+            'queues as menunggu_count' => function ($q) {
+                $q->where('status', 'menunggu');
+            },
+            // jumlah antrian dipanggil (sekarang)
+            'queues as sekarang_count' => function ($q) {
+                $q->where('status', 'dipanggil');
+            },
+            // jumlah antrian selesai
+            'queues as selesai_count' => function ($q) {
+                $q->where('status', 'selesai');
+            },
+            // jumlah antrian skip
+            'queues as skip_count' => function ($q) {
+                $q->where('status', 'skip');
+            },
+        ])->orderBy('name')->get(['id', 'name']);
     }
-    public function getRekapHarian()
+
+    public function getRekapJumlahPemohon()
     {
-    return Service::query()
-        ->withCount(['queues as total' => function ($q) {
-            $q->whereBetween('created_at', [
-                now()->parse($this->from)->startOfDay(),
-                now()->parse($this->to)->endOfDay(),
-            ]);
-        }])
-        ->orderBy('name')
-        ->get(['id', 'name']); // ambil id & name
+        $from = now()->parse($this->from)->startOfDay();
+        $to   = now()->parse($this->to)->endOfDay();
+
+        return DB::table('instansis as i')
+            ->select('i.instansi_id', 'i.nama_instansi as name', DB::raw('COUNT(q.id) as total_pemohon'))
+            ->leftJoin('services as s', 's.instansi_id', '=', 'i.instansi_id')
+            ->leftJoin('queues as q', function ($join) use ($from, $to) {
+                $join->on('q.service_id', '=', 's.id')
+                    ->whereBetween('q.created_at', [$from, $to]);
+            })
+            ->groupBy('i.instansi_id', 'i.nama_instansi')
+            ->orderBy('i.nama_instansi')
+            ->get();
     }
+
 
     public function exportExcel()
     {
@@ -120,5 +140,4 @@ class MonitoringDashboard extends Page implements Forms\Contracts\HasForms
         );
     }    
 
-    
 }

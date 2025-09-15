@@ -16,10 +16,12 @@ class Service extends Model
         // relasi ke Queue
     public function queues()
     {
-        return $this->hasMany(Queue::class, 'service_id');
-    }   
-    public function instans()
-    {
-        return $this->belongsTo(Instansi::class);
+        return $this->hasMany(\App\Models\Queue::class, 'service_id', 'id');
     }
+  
+    public function instansi()
+    {
+        return $this->belongsTo(\App\Models\Instansi::class, 'instansi_id', 'id');
+    }
+
 }
