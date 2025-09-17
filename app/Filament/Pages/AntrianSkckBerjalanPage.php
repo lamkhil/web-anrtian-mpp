@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\AntrianSkck;
 use Filament\Pages\Page;
 use Filament\Pages\SimplePage;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -30,7 +31,14 @@ class AntrianSkckBerjalanPage extends SimplePage implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->defaultSort('created_at','desc')
+            ->defaultSort('created_at', 'desc')
+            ->headerActions([
+                Action::make('daftar')
+                    ->label('Daftar Antrian')
+                    ->action(function () {
+                        return $this->redirect('/antrian-skck-mpp');
+                    })
+            ])
             ->query(
                 AntrianSkck::query()
                     ->whereDate('created_at', now()->toDateString())
@@ -39,8 +47,8 @@ class AntrianSkckBerjalanPage extends SimplePage implements HasTable
                 TextColumn::make('nama')->label('Nama')
                     ->searchable(),
                 TextColumn::make('antrian')->label('Nomor Antrian')
-                ->alignCenter()
-                    ->formatStateUsing(fn($state)=>str_pad($state,3,'0', STR_PAD_LEFT)),
+                    ->alignCenter()
+                    ->formatStateUsing(fn($state) => str_pad($state, 3, '0', STR_PAD_LEFT)),
                 TextColumn::make('created_at')
                     ->dateTime('H:i')
                     ->alignEnd()
