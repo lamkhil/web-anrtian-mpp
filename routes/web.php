@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\QueueKioskController;
 use App\Exports\RekapLayananExport;
+use App\Filament\Pages\AntrianSkckBerjalanPage;
+use App\Filament\Pages\AntrianSkckPage;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('queue-status', QueueStatus::class)->name('queue.status');
@@ -19,3 +21,8 @@ Route::get('/export/rekap-jumlah-pemohon', function (\Illuminate\Http\Request $r
 
     return Excel::download(new RekapLayananExport($from, $to), 'rekap_jumlah_pemohon.xlsx');
 })->name('export.rekap-jumlah-pemohon');
+
+
+Route::get('/antrian-skck-mpp', AntrianSkckPage::class);
+Route::get('/antrian-skck-mpp/terdaftar', AntrianSkckBerjalanPage::class);
+Route::get('/antrian-skck-mpp/{id}',[ ExportController::class, 'cetakSkck']);

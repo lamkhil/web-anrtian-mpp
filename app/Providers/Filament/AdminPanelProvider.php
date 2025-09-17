@@ -57,9 +57,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->sidebarCollapsibleOnDesktop()
-            ->font('poppins');
-
-        
-    
-            }
+            ->font('poppins')
+            ->viteTheme('resources/css/filament/admin/theme.css');
+    }
 }
