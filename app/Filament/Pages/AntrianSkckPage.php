@@ -179,7 +179,7 @@ class AntrianSkckPage extends SimplePage implements HasForms
                     ->extraAttributes([
                         'class' => 'mt-8 text-center font-bold text-xl text-red-600',
                     ])
-                    ->content('Antrian SKCK Masih Tutup')
+                    ->content('Pendaftaran Antrian SKCK Sedang Tutup')
                     ->visible(function () {
                         $now = new DateTime;
                         $limit = new DateTime(AntrianSkckPage::limit1);
