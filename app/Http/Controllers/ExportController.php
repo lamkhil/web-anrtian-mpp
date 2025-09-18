@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Exports\RekapLayananExport;
 use App\Models\AntrianSkck;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportController extends Controller
 {
-
     private $bulan = [
         1 => 'Januari',
         2 => 'Februari',
@@ -29,7 +28,7 @@ class ExportController extends Controller
     public function rekapLayanan(Request $request)
     {
         $from = $request->query('from', now()->toDateString());
-        $to   = $request->query('to', now()->toDateString());
+        $to = $request->query('to', now()->toDateString());
 
         $fileName = "rekap_layanan_{$from}_sd_{$to}.xlsx";
 
@@ -38,29 +37,51 @@ class ExportController extends Controller
 
     public function cetakSkck(Request $request, $id)
     {
-        $id = str_replace('SKCK', '', $id);
+        try {
+            $id = base64_decode(str_replace('SKCK', '', $id));
 
-        $antrianSkck = AntrianSkck::find($id);
+            $antrianSkck = AntrianSkck::find($id);
 
-        if ($antrianSkck == null) abort(404);
+            if ($antrianSkck == null) {
+                abort(404);
+            }
 
-        $logo = public_path('logo_pemkot.png');
+            $logo = public_path('logo_pemkot.png');
 
-        $logoBase64 = base64_encode(file_get_contents($logo));
-        $tanggal = date('j', strtotime($antrianSkck->created_at));
-        $bulanAngka = date('n', strtotime($antrianSkck->created_at));
-        $tahun = date('Y', strtotime($antrianSkck->created_at));
+            $logoBase64 = base64_encode(file_get_contents($logo));
+            $tanggal = date('j', strtotime($antrianSkck->created_at));
+            $bulanAngka = date('n', strtotime($antrianSkck->created_at));
+            $tahun = date('Y', strtotime($antrianSkck->created_at));
 
-        $format = $tanggal . ' ' . $this->bulan[$bulanAngka] . ' ' . $tahun;
-        $pdf = Pdf::loadView('antrian-skck', [
-            'logo' => $logoBase64,
-            'nomor' => str_pad($antrianSkck->antrian, 3, '0', STR_PAD_LEFT),
-            'tanggal' => $format,
-            'nama' => $antrianSkck->nama
-        ]);
+            $format = $tanggal.' '.$this->bulan[$bulanAngka].' '.$tahun;
+            $pdf = Pdf::loadView('antrian-skck', [
+                'logo' => $logoBase64,
+                'nomor' => str_pad($antrianSkck->antrian, 3, '0', STR_PAD_LEFT),
+                'tanggal' => $format,
+                'nama' => strtoupper($antrianSkck->nama),
+            ]);
 
-        $customPaper = [0, 0, 360, 360];
+            $customPaper = [0, 0, 360, 360];
 
-        return $pdf->setPaper($customPaper)->stream($id . '.pdf');
+            return $pdf->setPaper($customPaper)->stream($id.'.pdf');
+        } catch (\Throwable $th) {
+            abort(404);
+        }
+    }
+
+    public function cetakRekap(Request $request)
+    {
+        $logo = public_path('logo.png');
+
+            $logoBase64 = base64_encode(file_get_contents($logo));
+
+            $pdf = Pdf::loadView('rekap-antrian', [
+                'logo' => $logoBase64,
+                'data' => AntrianSkck::query()
+                    ->whereDate('created_at', now()->toDateString())
+                    ->orderBy('antrian', 'asc')->get()
+            ]);
+
+            return $pdf->setPaper('a4','potrait')->stream(date('d-M-Y').'.pdf');
     }
 }

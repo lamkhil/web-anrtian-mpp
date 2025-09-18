@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('/')
+            ->path('admin')
             ->login()
             ->colors([
                 'primary' => Color::Blue,
@@ -58,6 +58,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->sidebarCollapsibleOnDesktop()
             ->font('poppins')
+            ->darkMode(false)
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

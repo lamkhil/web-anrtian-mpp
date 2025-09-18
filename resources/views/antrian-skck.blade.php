@@ -46,12 +46,12 @@
     <h2>KOTA SURABAYA</h2>
     <h3>Zona 2 - Loket 2A<br>Layanan SKCK</h3>
 
-    <div class="number">{{$nomor}}</div>
+    <div class="number">2A - {{$nomor}}</div>
 
     <div class="info">
       <p><strong>{{$nama}}</strong></p>
       <p>{{$tanggal}}</p>
-      <p>Jam Layanan : 09.00 - 14.00</p>
+      <p>Jam Layanan : 08.00 - Selesai</p>
     </div>
   </div>
 </body>

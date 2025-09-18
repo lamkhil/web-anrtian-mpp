@@ -22,7 +22,16 @@ Route::get('/export/rekap-jumlah-pemohon', function (\Illuminate\Http\Request $r
     return Excel::download(new RekapLayananExport($from, $to), 'rekap_jumlah_pemohon.xlsx');
 })->name('export.rekap-jumlah-pemohon');
 
+Route::domain('skck.dpmptsp-surabaya.my.id')->group(function () {
+    Route::get('/', AntrianSkckPage::class);
+    Route::get('/terdaftar', AntrianSkckBerjalanPage::class);
+    Route::get('/terdaftar/print',[ExportController::class, 'cetakRekap']);
+    Route::get('/print/{id}',[ ExportController::class, 'cetakSkck']);
+});
 
-Route::get('/antrian-skck-mpp', AntrianSkckPage::class);
-Route::get('/antrian-skck-mpp/terdaftar', AntrianSkckBerjalanPage::class);
-Route::get('/antrian-skck-mpp/{id}',[ ExportController::class, 'cetakSkck']);
+Route::prefix('skck')->group(function () {
+    Route::get('/', AntrianSkckPage::class);
+    Route::get('/terdaftar', AntrianSkckBerjalanPage::class);
+    Route::get('/terdaftar/print',[ExportController::class, 'cetakRekap']);
+    Route::get('/print/{id}',[ ExportController::class, 'cetakSkck']);
+});

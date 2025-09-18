@@ -1,4 +1,7 @@
 <x-filament-panels::page.simple>
-    <img src="{{ asset('logo.png') }}" alt="LOGO DPMPTSP">
-{{$this->table}}
+    <div class="text-center w-full">
+        {{ date('d M Y') }}
+        <img class="w-full text-center" src="{{ asset('logo.png') }}" alt="LOGO DPMPTSP">
+    </div>
+    {{$this->table}}
 </x-filament-panels::page.simple>
